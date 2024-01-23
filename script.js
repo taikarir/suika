@@ -112,13 +112,13 @@ document.body.addEventListener('click', (event) => {
                 friction: ballFriction,
                 restitution: floorRestitution,
                 render: {
-                    fillStyle: "blue",
-                    strokeStyle: "blue",
-                    lineWidth: 2,
+                    // fillStyle: "blue",
+                    // strokeStyle: "blue",
+                    // lineWidth: 2,
                     sprite: {
                         texture: types[type].img.src,
-                        xScale: size * 1.5 / types[type].img.width, // Adjust based on image dimensions
-                        yScale: size * 1.5 / types[type].img.height
+                        xScale: size * 2 / types[type].img.width, // Adjust based on image dimensions
+                        yScale: size * 2 / types[type].img.height
                     }
                 }
             }
@@ -188,9 +188,9 @@ Events.on(engine, 'collisionStart', (event) => {
                         friction: ballFriction,
                         restitution: floorRestitution,
                         render: {
-                            fillStyle: "blue",
-                            strokeStyle: "blue",
-                            lineWidth: 2,
+                            // fillStyle: "blue",
+                            // strokeStyle: "blue",
+                            // lineWidth: 2,
                             sprite: {
                                 texture: types[type].img.src,
                                 xScale: newR * 2 / types[type].img.width, // Adjust based on image dimensions
