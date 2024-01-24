@@ -24,8 +24,8 @@ const floorRestitution = 0;
 const wallRestitution = 0.20;
 
 var score = 0;
-var heldPiece;
-var nextPiece;
+var held;
+var next;
 
 var types = {
     0: karina,
@@ -119,29 +119,26 @@ Composite.add(engine.world, verticalLine);
 document.body.addEventListener('click', (event) => {
     // Create a new circle at mouse position and add it to the world
     // loadImage("./assets/yunjin.jpeg",)
-    var x = Math.random();
     var circle;
-    if (x<1) {
-        var type = Math.round(x*4);
-        // type = 0;
-        const size = baseSize * Math.pow(scaling, type);
-        circle = Bodies.circle(event.pageX, 0, size,
-            {
-                friction: ballFriction,
-                restitution: floorRestitution,
-                render: {
-                    // fillStyle: "blue",
-                    // strokeStyle: "blue",
-                    // lineWidth: 2,
-                    sprite: {
-                        texture: types[type].img.src,
-                        xScale: size * 2 / types[type].img.width, // Adjust based on image dimensions
-                        yScale: size * 2 / types[type].img.height
-                    }
+    var type = randomBall(0,4);
+    // type = 0;
+    const size = baseSize * Math.pow(scaling, type);
+    circle = Bodies.circle(event.pageX, 0, size,
+        {
+            friction: ballFriction,
+            restitution: floorRestitution,
+            render: {
+                // fillStyle: "blue",
+                // strokeStyle: "blue",
+                // lineWidth: 2,
+                sprite: {
+                    texture: types[type].img.src,
+                    xScale: size * 2 / types[type].img.width, // Adjust based on image dimensions
+                    yScale: size * 2 / types[type].img.height
                 }
             }
-        );
-    }
+        }
+    );
     // } else {
     //     circle = Bodies.circle(event.pageX, 0, 60,
     //         {
