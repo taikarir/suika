@@ -19,11 +19,13 @@ const wallWidth = 10;
 const floorWidth = 50;
 
 const boxFriction = 0;
-const ballFriction = 0.05;
+const ballFriction = 0.3;
 const floorRestitution = 0;
 const wallRestitution = 0.20;
 
-var score = 0
+var score = 0;
+var heldPiece;
+var nextPiece;
 
 var types = {
     0: karina,
@@ -70,8 +72,8 @@ var render = Render.create({
     element: document.body,
     engine: engine,
     options: {
-        width: gameWidth+100,
-        height: gameHeight+200,
+        width: gameWidth,
+        height: gameHeight+100,
         wireframes: false, // disable Wireframe
     }
 });
@@ -79,9 +81,9 @@ var render = Render.create({
 // create two boxes and a ground
 // var boxA = Bodies.rectangle(400, 200, 80, 80);
 // var boxB = Bodies.rectangle(450, 50, 80, 80);
-var lwall = Bodies.rectangle(50-wallWidth/2, gameHeight/2+100, wallWidth, gameHeight, {isStatic: true, friction: boxFriction, restitution: wallRestitution});
-var rwall = Bodies.rectangle(gameWidth+50+wallWidth/2, gameHeight/2+100, wallWidth, gameHeight, {isStatic: true, friction: boxFriction, restitution: wallRestitution});
-var ground = Bodies.rectangle((gameWidth+100)/2, gameHeight+floorWidth/2+100, gameWidth+2*wallWidth, floorWidth, {isStatic: true, friction: boxFriction, restitution: floorRestitution});
+var lwall = Bodies.rectangle(-wallWidth/2, gameHeight/2+100, wallWidth, gameHeight, {isStatic: true, friction: boxFriction, restitution: wallRestitution});
+var rwall = Bodies.rectangle(gameWidth+wallWidth/2, gameHeight/2+100, wallWidth, gameHeight, {isStatic: true, friction: boxFriction, restitution: wallRestitution});
+var ground = Bodies.rectangle((gameWidth)/2, gameHeight+floorWidth/2, gameWidth+2*wallWidth, floorWidth, {isStatic: true, friction: boxFriction, restitution: floorRestitution});
 
 // add all of the bodies to the world
 Composite.add(engine.world, [lwall, rwall, ground]);
@@ -99,6 +101,20 @@ function isPointOccupied(x, y) {
     const bodies = Query.point(engine.world.bodies, { x: x, y: y });
     return bodies.length > 0;
 }
+
+const verticalLine = Bodies.rectangle(0, gameHeight/2, 2, gameHeight,
+    {
+        isStatic: true,
+        isSensor: true,
+        render: {
+            fillStyle: 'white', // Set the fill color to blue
+            visible: true
+        }
+    }
+);
+
+// Add the line to the world
+Composite.add(engine.world, verticalLine);
 
 document.body.addEventListener('click', (event) => {
     // Create a new circle at mouse position and add it to the world
@@ -142,21 +158,11 @@ document.body.addEventListener('click', (event) => {
     Composite.add(engine.world, circle);
 });
 
-// const verticalLine = Bodies.rectangle(0, 0, 20, window.innerHeight, { isStatic: true, render: { visible: true } });
-//
-// // Add the line to the world
-// Composite.add(engine.world, verticalLine);
-//
-// // Function to update the vertical line position
-// function updateVerticalLine(x) {
-//     // Update the position of the line based on the cursor's x-coordinate
-//     verticalLine.position.x = x;
-// }
-// document.body.addEventListener('mousemove', (event) => {
-//     console.log("yes");
-//     // Update the position of the vertical line based on the cursor's x-coordinate
-//     updateVerticalLine(event.pageX);
-// });
+document.body.addEventListener('mousemove', (event) => {
+    console.log(verticalLine.position.x);
+    // Update the position of the vertical line based on the cursor's x-coordinate
+    Matter.Body.setPosition(verticalLine, { x: event.pageX, y: gameHeight/2 });
+});
 
 Events.on(engine, 'collisionStart', (event) => {
     event.pairs.forEach((pair) => {
