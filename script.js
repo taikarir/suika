@@ -24,8 +24,8 @@ const floorRestitution = 0;
 const wallRestitution = 0.20;
 
 var score = 0;
-var held;
-var next;
+var held = randomBall(0,4);
+var next = randomBall(0,4);
 
 var types = {
     0: karina,
@@ -120,10 +120,10 @@ document.body.addEventListener('click', (event) => {
     // Create a new circle at mouse position and add it to the world
     // loadImage("./assets/yunjin.jpeg",)
     var circle;
-    var type = randomBall(0,4);
+    var type = held;
     // type = 0;
     const size = baseSize * Math.pow(scaling, type);
-    circle = Bodies.circle(event.pageX, 0, size,
+    circle = Bodies.circle(verticalLine.position.x, 0, size,
         {
             friction: ballFriction,
             restitution: floorRestitution,
@@ -139,26 +139,17 @@ document.body.addEventListener('click', (event) => {
             }
         }
     );
-    // } else {
-    //     circle = Bodies.circle(event.pageX, 0, 60,
-    //         {
-    //             render: {
-    //                     sprite: {
-    //                         texture: kimjongun.img.src,
-    //                         xScale: 60 * 2 / kimjongun.img.width, // Adjust based on image dimensions
-    //                         yScale: 60 * 2 / kimjongun.img.height
-    //                     }
-    //             }
-    //         }
-    //     );
-    // }
+
     Composite.add(engine.world, circle);
+    held = randomBall(0,4);
+    constrainLine(verticalLine);
 });
 
 document.body.addEventListener('mousemove', (event) => {
-    console.log(verticalLine.position.x);
+    // console.log(verticalLine.position.x);
     // Update the position of the vertical line based on the cursor's x-coordinate
-    Matter.Body.setPosition(verticalLine, { x: event.pageX, y: gameHeight/2 });
+
+    constrainLine(verticalLine);
 });
 
 Events.on(engine, 'collisionStart', (event) => {
@@ -178,10 +169,6 @@ Events.on(engine, 'collisionStart', (event) => {
                 const newR = bodyA.circleRadius * scaling; // Adjust the factor for the desired size
                 Composite.remove(engine.world, [bodyA, bodyB]);
                 console.log(newR);
-
-                // while (isPointOccupied(newX, newY-newR)) {
-                //     newY += 1; // Move upward until finding an unoccupied position
-                // }
 
                 // Create a new circle with a larger radius
                 const size = newR / baseSize;
