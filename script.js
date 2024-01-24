@@ -23,6 +23,8 @@ const ballFriction = 0.05;
 const floorRestitution = 0;
 const wallRestitution = 0.20;
 
+var score = 0
+
 var types = {
     0: karina,
     1: wonyoung,
@@ -182,6 +184,8 @@ Events.on(engine, 'collisionStart', (event) => {
                 const size = newR / baseSize;
                 const type = Math.round(Math.log(size)/Math.log(scaling));
                 console.log(type);
+
+                score += scoring[type-1];
 
                 const newCircle = Bodies.circle(newX, newY, newR,
                     {
