@@ -18,14 +18,16 @@ const gameHeight = 600;
 const wallWidth = 10;
 const floorWidth = 50;
 
-const boxFriction = 0;
-const ballFriction = 0.3;
+const boxFriction = 1;
+const ballFriction = 0.2;
 const floorRestitution = 0;
 const wallRestitution = 0.20;
 
 var score = 0;
 var held = randomBall(0,4);
 var next = randomBall(0,4);
+var type = held;
+
 
 var types = {
     0: karina,
@@ -85,6 +87,8 @@ var lwall = Bodies.rectangle(-wallWidth/2, gameHeight/2+100, wallWidth, gameHeig
 var rwall = Bodies.rectangle(gameWidth+wallWidth/2, gameHeight/2+100, wallWidth, gameHeight, {isStatic: true, friction: boxFriction, restitution: wallRestitution});
 var ground = Bodies.rectangle((gameWidth)/2, gameHeight+floorWidth/2, gameWidth+2*wallWidth, floorWidth, {isStatic: true, friction: boxFriction, restitution: floorRestitution});
 
+
+
 // add all of the bodies to the world
 Composite.add(engine.world, [lwall, rwall, ground]);
 
@@ -113,51 +117,80 @@ const verticalLine = Bodies.rectangle(0, gameHeight/2, 2, gameHeight,
     }
 );
 
+console.log(held);
+console.log(getSize(held));
+console.log(types[held]);
+var heldCircle = Bodies.circle(0, 10, getSize(held),
+    {
+        isStatic: true,
+        isSensor: true,
+        friction: ballFriction,
+        restitution: floorRestitution,
+        render: {
+            sprite: {
+                texture: types[held].img.src,
+                xScale: getSize(held) * 2 / types[held].img.width, // Adjust based on image dimensions
+                yScale: getSize(held) * 2 / types[held].img.height
+            }
+        }
+    }
+);
+
 // Add the line to the world
 Composite.add(engine.world, verticalLine);
+Composite.add(engine.world, heldCircle);
 
 document.body.addEventListener('click', (event) => {
     // Create a new circle at mouse position and add it to the world
     // loadImage("./assets/yunjin.jpeg",)
     var circle;
-    var type = held;
+    // var type = held;
     // type = 0;
-    const size = baseSize * Math.pow(scaling, type);
-    circle = Bodies.circle(verticalLine.position.x, 0, size,
+    const size = getSize(type);
+    // Matter.Body.setMass(heldCircle, 0.001 * (heldCircle.width * heldCircle.height));
+    Matter.Body.setStatic(heldCircle, false);
+    heldCircle.isSensor = false;
+    held = next;
+    heldCircle = Bodies.circle(0, 10, getSize(next),
         {
+            isStatic: true,
+            isSensor: true,
             friction: ballFriction,
             restitution: floorRestitution,
             render: {
-                // fillStyle: "blue",
-                // strokeStyle: "blue",
-                // lineWidth: 2,
                 sprite: {
-                    texture: types[type].img.src,
-                    xScale: size * 2 / types[type].img.width, // Adjust based on image dimensions
-                    yScale: size * 2 / types[type].img.height
+                    texture: types[next].img.src,
+                    xScale: getSize(next) * 2 / types[next].img.width, // Adjust based on image dimensions
+                    yScale: getSize(next) * 2 / types[held].img.height
                 }
             }
         }
     );
-
-    Composite.add(engine.world, circle);
-    held = randomBall(0,4);
-    constrainLine(verticalLine);
+    // heldCircle.render = {
+    //     sprite: {
+    //         texture: types[held].img.src,
+    //         xScale: getSize(held) * 2 / types[held].img.width, // Adjust based on image dimensions
+    //         yScale: getSize(held) * 2 / types[held].img.height
+    //     }
+    // };
+    Composite.add(engine.world, heldCircle);
+    next = randomBall(0,4);
+    constrain(verticalLine, heldCircle);
 });
 
 document.body.addEventListener('mousemove', (event) => {
     // console.log(verticalLine.position.x);
     // Update the position of the vertical line based on the cursor's x-coordinate
 
-    constrainLine(verticalLine);
+    constrain(verticalLine, heldCircle);
 });
 
 Events.on(engine, 'collisionStart', (event) => {
     event.pairs.forEach((pair) => {
         const bodyA = pair.bodyA;
         const bodyB = pair.bodyB;
-        console.log(bodyA,bodyB);
-        if (bodyA.id < bodyB.id) {
+        // console.log(bodyA,bodyB);
+        if (bodyA.id < bodyB.id && bodyA.isSensor === false && bodyB.isSensor === false) {
 
             // Check if both bodies are circles and have the same radius
             if (Collision.collides(bodyA, bodyB) && Math.round(bodyA.circleRadius) === Math.round(bodyB.circleRadius)) {
@@ -168,12 +201,12 @@ Events.on(engine, 'collisionStart', (event) => {
                 const oldR = bodyA.circleRadius;
                 const newR = bodyA.circleRadius * scaling; // Adjust the factor for the desired size
                 Composite.remove(engine.world, [bodyA, bodyB]);
-                console.log(newR);
+                // console.log(newR);
 
                 // Create a new circle with a larger radius
                 const size = newR / baseSize;
                 const type = Math.round(Math.log(size)/Math.log(scaling));
-                console.log(type);
+                // console.log(type);
 
                 score += scoring[type-1];
 
@@ -193,9 +226,12 @@ Events.on(engine, 'collisionStart', (event) => {
                         }
                     }
                 );
+                // Matter.Body.setMass(myBody, 0.001 * (myBody.width * myBody.height))
+                // Matter.Body.setStatic(myBody, false)
 
                 // Add the new circle to the world
                 Composite.add(engine.world, newCircle);
+                // updateScore();
             }
         }
     });
