@@ -12,7 +12,7 @@ const jisoo = new LoadedImage("./assets/jisoo.png");
 const eunwoo = new LoadedImage("./assets/eunwoo.png");
 
 const baseSize = 15;
-const scaling = 1.3;
+const scaling = 1.27;
 const gameWidth = 600;
 const gameHeight = 600;
 const wallWidth = 10;
@@ -101,10 +101,10 @@ var runner = Runner.create();
 // run the engine
 Runner.run(runner, engine);
 
-function isPointOccupied(x, y) {
-    const bodies = Query.point(engine.world.bodies, { x: x, y: y });
-    return bodies.length > 0;
-}
+// function isPointOccupied(x, y) {
+//     const bodies = Query.point(engine.world.bodies, { x: x, y: y });
+//     return bodies.length > 0;
+// }
 
 const verticalLine = Bodies.rectangle(0, gameHeight/2, 2, gameHeight,
     {
@@ -117,30 +117,36 @@ const verticalLine = Bodies.rectangle(0, gameHeight/2, 2, gameHeight,
     }
 );
 
-console.log(held);
-console.log(getSize(held));
-console.log(types[held]);
-var heldCircle = Bodies.circle(0, 10, getSize(held),
+// console.log(held);
+// console.log(getSize(held));
+// console.log(types[held].img.width);
+// console.log(types[held].img.height);
+// console.log(types[held].img);
+// var heldCircle;
+var heldCircle = Bodies.circle(0, 50, getSize(held),
     {
         isStatic: true,
         isSensor: true,
+        slop: 0,
         friction: ballFriction,
-        restitution: floorRestitution,
-        render: {
-            sprite: {
-                texture: types[held].img.src,
-                xScale: getSize(held) * 2 / types[held].img.width, // Adjust based on image dimensions
-                yScale: getSize(held) * 2 / types[held].img.height
-            }
-        }
+        restitution: floorRestitution
+        // render: {
+        //     sprite: {
+        //         texture: types[held].img.src,
+        //         xScale: getSize(held) * 2 / types[held].img.width, // Adjust based on image dimensions
+        //         yScale: getSize(held) * 2 / types[held].img.height
+        //     }
+        // }
     }
 );
 
 // Add the line to the world
 Composite.add(engine.world, verticalLine);
-Composite.add(engine.world, heldCircle);
+// Composite.add(engine.world, heldCircle);
 
 document.body.addEventListener('click', (event) => {
+    // console.log(types[held].img.height);
+
     // Create a new circle at mouse position and add it to the world
     // loadImage("./assets/yunjin.jpeg",)
     var circle;
@@ -151,10 +157,11 @@ document.body.addEventListener('click', (event) => {
     Matter.Body.setStatic(heldCircle, false);
     heldCircle.isSensor = false;
     held = next;
-    heldCircle = Bodies.circle(0, 10, getSize(next),
+    heldCircle = Bodies.circle(0, 50, getSize(next),
         {
             isStatic: true,
             isSensor: true,
+            slop: 0,
             friction: ballFriction,
             restitution: floorRestitution,
             render: {
@@ -214,6 +221,7 @@ Events.on(engine, 'collisionStart', (event) => {
                     {
                         friction: ballFriction,
                         restitution: floorRestitution,
+                        slop: 0,
                         render: {
                             // fillStyle: "blue",
                             // strokeStyle: "blue",
