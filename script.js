@@ -11,6 +11,14 @@ const felix = new LoadedImage("./assets/felix.png");
 const jisoo = new LoadedImage("./assets/jisoo.png");
 const eunwoo = new LoadedImage("./assets/eunwoo.png");
 
+window.onload = init;
+
+var scoreDiv;
+function init(){
+    scoreDiv = document.getElementById("score");
+}
+// console.log(scoreDiv);
+
 const baseSize = 15;
 const scaling = 1.27;
 const gameWidth = 600;
@@ -216,6 +224,7 @@ Events.on(engine, 'collisionStart', (event) => {
                 // console.log(type);
 
                 score += scoring[type-1];
+                scoreDiv.innerHTML = "SCORE: "+ score;
 
                 const newCircle = Bodies.circle(newX, newY, newR,
                     {
